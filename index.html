@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syllabic Verse | Literature & Poetry</title>
+  <meta name="description" content="Syllabic Verse: poems, stories, novels and books by Mahfuja.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Splash intro (app.js removes it after 5 seconds) -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <h1 class="splash-title">Syllabic Verse</h1>
+      <div class="splash-line"></div>
+      <p class="splash-subtitle">Developed by Raflido Studios</p>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <a href="#" class="brand-logo" onclick="event.preventDefault(); showView('literature')">Syllabic Verse</a>
+    <div class="nav-actions">
+      <button class="nav-link active" data-view="literature" onclick="showView('literature')">Literature</button>
+      <button class="nav-link" data-view="shop" onclick="showView('shop')">Book Shop</button>
+      <button class="btn-theme" onclick="toggleTheme()" id="themeToggleBtn">Light Mode</button>
+      <button class="btn-outline" onclick="openAuthorModal()">About Author</button>
+      <button id="loginBtn" class="btn-primary" onclick="googleSignIn()">Sign In</button>
+      <div id="userBadge" class="user-badge" style="display:none;">
+        <img id="userAvatar" src="" alt="">
+        <span id="userName">Reader</span>
+        <button onclick="googleSignOut()" class="btn-outline btn-sm">Logout</button>
+      </div>
+      <a href="admin.html" class="btn-outline">Admin</a>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- ===== Literature view ===== -->
+    <section id="viewLiterature">
+      <header class="header">
+        <h1>Syllabic Verse</h1>
+        <p>Poems, stories, novels and essays, gathered in one quiet place.</p>
+      </header>
+
+      <div class="controls-section">
+        <div class="search-sort-row">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search title, author or content">
+          </div>
+          <div class="sort-box">
+            <select id="sortSelect" onchange="changeSort(this.value)">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="likes">Most liked</option>
+            </select>
+          </div>
+        </div>
+        <div class="category-tabs">
+          <button class="tab-btn active" onclick="filterCategory('All')">All</button>
+          <button class="tab-btn" onclick="filterCategory('Story')">Story</button>
+          <button class="tab-btn" onclick="filterCategory('Poem')">Poem</button>
+          <button class="tab-btn" onclick="filterCategory('Novel')">Novel</button>
+          <button class="tab-btn" onclick="filterCategory('Essay')">Essay</button>
+          <button class="tab-btn" onclick="filterCategory('Drama')">Drama</button>
+          <button class="tab-btn" onclick="filterCategory('Saved')">Saved</button>
+        </div>
+      </div>
+
+      <!-- Skeleton loader (app.js hides it when data arrives) -->
+      <div id="bookLoader" class="loader-container" aria-label="Loading writings">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+
+      <div id="articlesGrid" class="main-container"></div>
+      <div id="pagination" class="pagination-container"></div>
+
+      <div class="author-bottom-section" onclick="toggleAuthorBottomDetails()">
+        <div class="author-bottom-header">
+          <img id="bottomAuthorImg" src="" class="author-bottom-avatar" alt="Author photo">
+          <div class="author-bottom-info">
+            <h3 id="bottomAuthorName">Mahfuja</h3>
+            <p>Founder and principal author. Click to read the full biography.</p>
+          </div>
+        </div>
+        <div id="authorBottomDetails" class="author-details-expand">
+          <p id="bottomAuthorBio">Loading biography...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Book Shop view (shop.js) ===== -->
+    <section id="viewShop" hidden>
+      <header class="shop-head">
+        <h2>Book Shop</h2>
+        <p>Pick a book and send your order with your delivery details.</p>
+      </header>
+      <div id="shopLoader" class="shop-grid" aria-label="Loading books">
+        <div class="skeleton book"></div>
+        <div class="skeleton book"></div>
+        <div class="skeleton book"></div>
+      </div>
+      <div id="shopGrid" class="shop-grid"></div>
+    </section>
+
+  </main>
+
+  <!-- Author modal -->
+  <div id="authorModal" class="modal-overlay" onclick="if (event.target === this) closeAuthorModal()">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeAuthorModal()" aria-label="Close">&times;</button>
+      <div class="author-modal-body">
+        <img id="modalAuthorImg" src="" alt="Author photo">
+        <h2 id="modalAuthorName">Mahfuja</h2>
+        <span class="role">Founder &amp; Author</span>
+        <p id="modalAuthorBio" class="author-bio"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order modal (shop.js) -->
+  <div id="orderModal" class="modal-overlay" onclick="if (event.target === this) closeOrder()">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeOrder()" aria-label="Close">&times;</button>
+      <div id="orderFormWrap">
+        <h3 class="order-title">Order: <span id="orderBookTitle"></span></h3>
+        <form id="orderForm" class="order-form" onsubmit="submitOrder(event)">
+          <label>Quantity
+            <input type="number" name="qty" value="1" min="1" max="50" class="form-control" oninput="updateTotal()">
+          </label>
+          <label>Full name
+            <input type="text" name="customerName" class="form-control" required>
+          </label>
+          <label>Phone
+            <input type="tel" name="phone" class="form-control" placeholder="01XXXXXXXXX" required>
+          </label>
+          <label>Delivery address
+            <textarea name="address" rows="3" class="form-control" required></textarea>
+          </label>
+          <label>Note (optional)
+            <input type="text" name="note" class="form-control">
+          </label>
+          <p class="order-total">Total: <strong id="orderTotal">৳ 0</strong></p>
+          <p id="orderMsg" class="form-msg"></p>
+          <button type="submit" class="btn-primary btn-block">Place order</button>
+        </form>
+      </div>
+      <div id="orderDone" class="order-done" hidden>
+        <h3>Order received</h3>
+        <p>Thank you. Your order has been saved.</p>
+        <button class="btn-outline" onclick="closeOrder()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Literature assistant -->
+  <button class="ai-widget-btn" onclick="toggleAIChat()">Ask Literature AI</button>
+  <div id="aiChatBox" class="ai-chat-box">
+    <div class="chat-header">
+      <span>Literature assistant</span>
+      <button class="chat-close" onclick="toggleAIChat()" aria-label="Close">&times;</button>
+    </div>
+    <div id="chatBody" class="chat-body">
+      <div class="chat-msg bot">Hi! Ask me about Mahfuja's poems, stories, or the books in the shop.</div>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chatInput" placeholder="Type a message" onkeypress="handleChatKey(event)">
+      <button onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Syllabic Verse</h3>
+        <p>A digital home for creative writing: poems, stories, novels, and the books written by Mahfuja.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <a href="#" onclick="event.preventDefault(); showView('literature')">All writings</a>
+        <a href="#" onclick="event.preventDefault(); showView('shop')">Book Shop</a>
+        <a href="#" onclick="event.preventDefault(); openAuthorModal()">About the author</a>
+        <a href="admin.html">Admin</a>
+      </div>
+      <div class="footer-credits">
+        <h4>Development</h4>
+        <p>Designed and developed by <strong>Raflido Studios</strong>.</p>
+        <p>All rights reserved.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Raflido Studios. Syllabic Verse is powered by Firebase.</p>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="app.js"></script>
+  <script src="shop.js"></script>
+</body>
+</html>
