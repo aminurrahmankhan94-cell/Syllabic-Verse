@@ -433,8 +433,9 @@ function sendChatMessage() {
 
 function getOfflineAIResponse(q) {
   q = q.toLowerCase();
-  if (q.includes("hello") || q.includes("hi")) return "Hello! Welcome to Onukto literature portal.";
-  if (q.includes("mahfuja") || q.includes("onukto")) return "Onukto is a literature portal created by Mahfuja, featuring poems, stories, and novels.";
-  if (q.includes("raflido")) return "Raflido Studios is the developer studio behind Onukto Portal.";
+  if (/\b(hi|hello)\b/.test(q)) return "Hello! Welcome to Syllabic Verse.";
+  if (q.includes("mahfuja") || q.includes("syllabic")) return "Syllabic Verse is a literature portal by Mahfuja, with poems, stories, novels and books for sale.";
+  if (q.includes("raflido")) return "Raflido Studios developed Syllabic Verse.";
+  if (q.includes("book") || q.includes("buy") || q.includes("order")) return "Open the Book Shop tab at the top to see books on sale and place an order.";
   return "Thank you for asking! Explore writings using categories or search above.";
 }

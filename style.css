@@ -631,6 +631,17 @@ button:disabled { opacity: 0.6; cursor: wait; }
 }
 .admin-table th { color: var(--text-muted); font-size: 12px; font-weight: 600; }
 
+/* ===== PDF / physical formats and preview reader ===== */
+.fmt-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.fmt { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--card-border); color: var(--text-muted); }
+.book-foot { flex-wrap: wrap; gap: 8px; }
+.fmt-choice { display: flex; flex-wrap: wrap; gap: 14px; }
+.fmt-choice label { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+.modal-content.reader { max-width: 560px; }
+.reader-img { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 8px; border: 1px solid var(--card-border); background: #fff; }
+.reader-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.reader-note { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
 /* ===== Responsive & motion preferences ===== */
 @media (max-width: 640px) {
   .article-title { font-size: 25px; }

@@ -109,6 +109,21 @@
 
   </main>
 
+  <!-- Preview reader (shop.js) -->
+  <div id="readerModal" class="modal-overlay" onclick="if (event.target === this) closeReader()">
+    <div class="modal-content reader">
+      <button class="close-modal" onclick="closeReader()" aria-label="Close">&times;</button>
+      <h3 id="readerTitle" class="order-title"></h3>
+      <img id="readerImg" class="reader-img" alt="Preview page">
+      <div class="reader-nav">
+        <button class="btn-outline btn-sm" id="readerPrev" onclick="turnPage(-1)">Previous</button>
+        <span id="readerCount"></span>
+        <button class="btn-outline btn-sm" id="readerNext" onclick="turnPage(1)">Next</button>
+      </div>
+      <p class="reader-note">Preview only. Order the book to get the full copy.</p>
+    </div>
+  </div>
+
   <!-- Author modal -->
   <div id="authorModal" class="modal-overlay" onclick="if (event.target === this) closeAuthorModal()">
     <div class="modal-content">
@@ -129,6 +144,10 @@
       <div id="orderFormWrap">
         <h3 class="order-title">Order: <span id="orderBookTitle"></span></h3>
         <form id="orderForm" class="order-form" onsubmit="submitOrder(event)">
+          <div class="fmt-choice">
+            <label id="fmtPdf"><input type="radio" name="format" value="pdf" onchange="onFormatChange()"> PDF (ebook)</label>
+            <label id="fmtPhysical"><input type="radio" name="format" value="physical" onchange="onFormatChange()"> Physical copy</label>
+          </div>
           <label>Quantity
             <input type="number" name="qty" value="1" min="1" max="50" class="form-control" oninput="updateTotal()">
           </label>
@@ -137,6 +156,9 @@
           </label>
           <label>Phone
             <input type="tel" name="phone" class="form-control" placeholder="01XXXXXXXXX" required>
+          </label>
+          <label>Email (optional, for PDF delivery)
+            <input type="email" name="email" class="form-control">
           </label>
           <label>Delivery address
             <textarea name="address" rows="3" class="form-control" required></textarea>
@@ -202,5 +224,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="app.js"></script>
   <script src="shop.js"></script>
+  <script src="fix-loading.js"></script>
 </body>
 </html>
