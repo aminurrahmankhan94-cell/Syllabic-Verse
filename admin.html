@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Raflido Studios</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="brand-logo">ADMIN CONTROL PANEL</div>
+    <a href="index.html" class="btn-outline">Reader Portal</a>
+  </nav>
+
+  <div class="container" style="margin-top: 30px;">
+    <!-- Admin Login Card -->
+    <div id="loginSection" class="article-card" style="max-width:400px; margin: 40px auto;">
+      <h2 style="margin-bottom:20px; text-align: center; letter-spacing: 1px;">ADMIN LOGIN</h2>
+      <div class="form-group">
+        <label>User ID</label>
+        <input type="text" id="adminId" class="form-control" placeholder="Enter Admin ID">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" placeholder="Enter Password">
+      </div>
+      <button onclick="handleLogin()" class="btn-primary" style="width: 100%; margin-top: 10px;">LOGIN</button>
+    </div>
+
+    <!-- Main Admin Dashboard Panel with Clean Tab System -->
+    <div id="adminPanel" style="display: none;">
+      
+      <!-- Admin Tab Navigation Menu -->
+      <div class="admin-tab-nav">
+        <button class="admin-tab-btn active" onclick="switchAdminTab(event, 'tab-overview')">Dashboard Stats</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab(event, 'tab-publish')">Publish Work</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab(event, 'tab-author')">Author Profile</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab(event, 'tab-moderation')">Manage Posts</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab(event, 'tab-readers')">Registered Readers</button>
+      </div>
+
+      <!-- TAB 1: Dashboard Overview & Stats -->
+      <div id="tab-overview" class="admin-tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="totalPosts">0</div>
+            <div style="font-size:12px; letter-spacing:1px; color:var(--text-muted); margin-top:5px;">TOTAL POSTS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="totalUsers">0</div>
+            <div style="font-size:12px; letter-spacing:1px; color:var(--text-muted); margin-top:5px;">REGISTERED READERS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="totalLikes">0</div>
+            <div style="font-size:12px; letter-spacing:1px; color:var(--text-muted); margin-top:5px;">TOTAL LIKES</div>
+          </div>
+        </div>
+
+        <div class="article-card">
+          <h3 style="margin-bottom:10px;">System Status</h3>
+          <p style="color:var(--text-muted); font-size:14px;">Welcome to the admin panel. Manage writings, reader accounts, author bios, and moderation directly from their dedicated tabs above.</p>
+        </div>
+      </div>
+
+      <!-- TAB 2: Publish / Edit Work Form -->
+      <div id="tab-publish" class="admin-tab-content">
+        <div class="article-card" id="postFormCard">
+          <h2 id="formHeading" style="margin-bottom:20px; letter-spacing: 1px;">PUBLISH NEW WORK</h2>
+          <input type="hidden" id="editArticleId" value="">
+          <div class="form-group"><label>Title</label><input type="text" id="title" class="form-control"></div>
+          <div class="form-group"><label>Author</label><input type="text" id="author" class="form-control" placeholder="Mahfuja"></div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="subject" class="form-control">
+              <option value="Story">Story</option>
+              <option value="Poem">Poem</option>
+              <option value="Novel">Novel</option>
+              <option value="Essay">Essay</option>
+              <option value="Drama">Drama</option>
+            </select>
+          </div>
+
+          <!-- Ultra-Compressing Post Image Upload -->
+          <div class="form-group">
+            <label>Post Image (Optional)</label>
+            <input type="file" id="postImgFile" class="form-control" accept="image/*" onchange="convertImageToBase64(this, 'postImgPreview', 'postImgData', 600)">
+            <input type="hidden" id="postImgData">
+            <img id="postImgPreview" src="" style="max-height:150px; display:none; margin-top:10px; border-radius:6px; border:1px solid var(--card-border);">
+          </div>
+
+          <div class="form-group"><label>Content</label><textarea id="content" class="form-control" rows="8"></textarea></div>
+          <div style="display:flex; gap:10px;">
+            <button id="savePostBtn" onclick="saveArticle()" class="btn-primary" style="flex:1;">PUBLISH WORK</button>
+            <button id="cancelEditBtn" onclick="resetForm()" class="btn-outline" style="display:none;">CANCEL EDIT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Author Profile Settings -->
+      <div id="tab-author" class="admin-tab-content">
+        <div class="article-card">
+          <h2 style="margin-bottom:20px; letter-spacing: 1px;">EDIT AUTHOR / POET PROFILE</h2>
+          <div class="form-group"><label>Author Name</label><input type="text" id="authorNameInput" class="form-control" placeholder="Mahfuja"></div>
+          
+          <div class="form-group">
+            <label>Author Photo</label>
+            <input type="file" id="authorImgFile" class="form-control" accept="image/*" onchange="convertImageToBase64(this, 'authorImgPreview', 'authorImgData', 300)">
+            <input type="hidden" id="authorImgData">
+            <img id="authorImgPreview" src="" style="max-width:80px; max-height:80px; display:none; margin-top:10px; border-radius:50%; border:2px solid var(--accent-gold);">
+          </div>
+
+          <div class="form-group"><label>Bio / Details</label><textarea id="authorBioInput" class="form-control" rows="6" placeholder="Write biography..."></textarea></div>
+          <button onclick="saveAuthorProfile()" class="btn-primary" style="width: 100%;">SAVE PROFILE DETAILS</button>
+        </div>
+      </div>
+
+      <!-- TAB 4: Manage Posts & Moderation -->
+      <div id="tab-moderation" class="admin-tab-content">
+        <div class="article-card">
+          <h2 style="margin-bottom: 20px; letter-spacing: 1px;">MANAGE POSTS & MODERATION</h2>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title & Category</th>
+                  <th>Pin</th>
+                  <th>Likes</th>
+                  <th>Comments</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Registered Readers -->
+      <div id="tab-readers" class="admin-tab-content">
+        <div class="article-card">
+          <h2 style="margin-bottom: 20px; letter-spacing: 1px;">REGISTERED GMAIL READERS</h2>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User Details</th>
+                  <th>Gmail Email</th>
+                  <th>UID</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom">
+      <p>&copy; 2026 Raflido Studios. Admin Portal.</p>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzvxeq6feVCSdcDVywh7mWikxbD3RryuU",
+      authDomain: "my-writer-gallery-2cd87.firebaseapp.com",
+      projectId: "my-writer-gallery-2cd87",
+      storageBucket: "my-writer-gallery-2cd87.firebasestorage.app",
+      messagingSenderId: "233413550719",
+      appId: "1:233413550719:web:fe5e2eae246ee601a3d54a"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function handleLogin() {
+      if (document.getElementById('adminId').value === 'admin' && document.getElementById('adminPass').value === '12345') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadAuthorProfile();
+        loadAdminData();
+        loadUserData();
+      } else alert("Invalid ID or Password.");
+    }
+
+    // Tab Switching Functionality
+    function switchAdminTab(e, tabId) {
+      document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      if (e && e.currentTarget) {
+        e.currentTarget.classList.add('active');
+      }
+    }
+
+    // High-Ratio Image Compression
+    function convertImageToBase64(fileInput, previewId, hiddenInputId, maxDim) {
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            document.getElementById(hiddenInputId).value = compressedBase64;
+            const previewImg = document.getElementById(previewId);
+            previewImg.src = compressedBase64;
+            previewImg.style.display = 'block';
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function loadAuthorProfile() {
+      db.collection("settings").doc("authorProfile").get().then(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          document.getElementById('authorNameInput').value = d.name || '';
+          document.getElementById('authorBioInput').value = d.bio || '';
+          if (d.image) {
+            document.getElementById('authorImgData').value = d.image;
+            const img = document.getElementById('authorImgPreview');
+            img.src = d.image;
+            img.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    function saveAuthorProfile() {
+      const btn = event.target;
+      btn.innerText = "SAVING...";
+      btn.disabled = true;
+
+      db.collection("settings").doc("authorProfile").set({
+        name: document.getElementById('authorNameInput').value,
+        image: document.getElementById('authorImgData').value,
+        bio: document.getElementById('authorBioInput').value
+      }).then(() => {
+        alert("Author Profile Updated successfully!");
+        btn.innerText = "SAVE PROFILE DETAILS";
+        btn.disabled = false;
+      }).catch(err => {
+        alert("Error: " + err.message);
+        btn.innerText = "SAVE PROFILE DETAILS";
+        btn.disabled = false;
+      });
+    }
+
+    function saveArticle() {
+      const saveBtn = document.getElementById('savePostBtn');
+      const editId = document.getElementById('editArticleId').value;
+      const title = document.getElementById('title').value.trim();
+      const author = document.getElementById('author').value.trim() || "Mahfuja";
+      const subject = document.getElementById('subject').value;
+      const imageUrl = document.getElementById('postImgData').value;
+      const content = document.getElementById('content').value.trim();
+
+      if (!title || !content) return alert("Title and Content are required.");
+
+      saveBtn.innerText = "PUBLISHING...";
+      saveBtn.disabled = true;
+
+      const postData = { title, author, subject, imageUrl, content };
+
+      if (editId) {
+        db.collection("articles").doc(editId).update(postData).then(() => {
+          alert("Post Updated Successfully!");
+          saveBtn.innerText = "PUBLISH WORK";
+          saveBtn.disabled = false;
+          resetForm();
+        }).catch(err => {
+          alert("Update Error: " + err.message);
+          saveBtn.innerText = "UPDATE POST";
+          saveBtn.disabled = false;
+        });
+      } else {
+        postData.likes = [];
+        postData.comments = [];
+        postData.isPinned = false;
+        postData.createdAt = new Date().toISOString();
+
+        db.collection("articles").add(postData).then(() => {
+          alert("Published Successfully!");
+          saveBtn.innerText = "PUBLISH WORK";
+          saveBtn.disabled = false;
+          resetForm();
+        }).catch(err => {
+          alert("Publish Error: " + err.message);
+          saveBtn.innerText = "PUBLISH WORK";
+          saveBtn.disabled = false;
+        });
+      }
+    }
+
+    function editPost(id, title, author, subject, imageUrl, content) {
+      // Auto switch to publish tab
+      document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('tab-publish').classList.add('active');
+
+      document.getElementById('editArticleId').value = id;
+      document.getElementById('title').value = title;
+      document.getElementById('author').value = author;
+      document.getElementById('subject').value = subject;
+      document.getElementById('postImgData').value = imageUrl || '';
+      document.getElementById('content').value = content;
+
+      const previewImg = document.getElementById('postImgPreview');
+      if (imageUrl) {
+        previewImg.src = imageUrl;
+        previewImg.style.display = 'block';
+      } else {
+        previewImg.style.display = 'none';
+      }
+
+      document.getElementById('formHeading').innerText = "EDIT POST";
+      document.getElementById('savePostBtn').innerText = "UPDATE POST";
+      document.getElementById('cancelEditBtn').style.display = "inline-block";
+      window.scrollTo({ top: document.getElementById('postFormCard').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      document.getElementById('editArticleId').value = '';
+      document.getElementById('title').value = '';
+      document.getElementById('author').value = '';
+      document.getElementById('postImgData').value = '';
+      document.getElementById('postImgFile').value = '';
+      document.getElementById('postImgPreview').style.display = 'none';
+      document.getElementById('content').value = '';
+      document.getElementById('formHeading').innerText = "PUBLISH NEW WORK";
+      document.getElementById('savePostBtn').innerText = "PUBLISH WORK";
+      document.getElementById('savePostBtn').disabled = false;
+      document.getElementById('cancelEditBtn').style.display = "none";
+    }
+
+    function togglePin(id, currentPin) {
+      db.collection("articles").doc(id).update({ isPinned: !currentPin });
+    }
+
+    function loadUserData() {
+      db.collection("users").onSnapshot(snapshot => {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = ''; let uCount = 0;
+
+        snapshot.forEach(doc => {
+          uCount++;
+          const u = doc.data();
+          const isBanned = u.isBanned || false;
+
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${u.name || 'Reader'}</strong></td>
+              <td>${u.email || 'N/A'}</td>
+              <td><small style="color:var(--text-muted);">${doc.id}</small></td>
+              <td><span style="color: ${isBanned ? 'var(--danger-color)' : '#00ff66'}; font-weight:700;">${isBanned ? 'BANNED' : 'ACTIVE'}</span></td>
+              <td>
+                <button class="${isBanned ? 'btn-primary' : 'btn-danger'}" onclick="toggleBanUser('${doc.id}', ${isBanned})">
+                  ${isBanned ? 'UNBAN' : 'BAN'}
+                </button>
+              </td>
+            </tr>`;
+        });
+        document.getElementById('totalUsers').innerText = uCount;
+      });
+    }
+
+    function toggleBanUser(uid, currentBanned) {
+      db.collection("users").doc(uid).update({ isBanned: !currentBanned });
+    }
+
+    function loadAdminData() {
+      db.collection("articles").onSnapshot(snapshot => {
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = ''; let tLikes = 0, count = 0;
+
+        snapshot.forEach(doc => {
+          count++; 
+          const data = doc.data(); 
+          const likes = Array.isArray(data.likes) ? data.likes : []; 
+          const comments = Array.isArray(data.comments) ? data.comments : [];
+          tLikes += likes.length;
+
+          let likersHtml = likes.map(l => {
+            const name = typeof l === 'string' ? 'User UID' : (l.name || 'Reader');
+            const email = typeof l === 'string' ? l : (l.email || '');
+            const uid = typeof l === 'string' ? l : l.uid;
+            return `<div style="font-size:11px; margin-top:3px; background:var(--bg-color); padding:4px 8px; border-radius:3px; display:flex; justify-content:space-between; border:1px solid var(--card-border);">
+                      <span>${name} (${email})</span>
+                      <button class="btn-danger" style="padding:1px 4px; font-size:9px;" onclick="removeSpecificLike('${doc.id}', '${uid}')">Remove</button>
+                    </div>`;
+          }).join('');
+
+          let commentsHtml = comments.map(c => `
+            <div style="margin-top:8px; font-size:12px; background:var(--bg-color); padding:8px; border-radius:4px; border:1px solid var(--card-border);">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span><strong>${escapeQuotes(c.name)} (${escapeQuotes(c.email || '')}):</strong> ${escapeQuotes(c.text)}</span>
+                <button class="btn-danger" style="padding:2px 6px; font-size:9px;" onclick="deleteComment('${doc.id}', '${c.id}')">Delete</button>
+              </div>
+              
+              ${(c.replies && c.replies.length > 0) ? c.replies.map(r => `
+                <div style="margin-top:4px; margin-left:10px; color:var(--text-muted); font-size:11px;">
+                  ↳ <strong>Admin Reply:</strong> ${escapeQuotes(r.text)}
+                </div>
+              `).join('') : ''}
+
+              <div style="display:flex; gap:5px; margin-top:6px;">
+                <input type="text" id="reply-input-${c.id}" placeholder="Write admin reply..." class="form-control" style="padding:4px 8px; font-size:11px;">
+                <button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="addAdminReply('${doc.id}', '${c.id}')">REPLY</button>
+              </div>
+            </div>
+          `).join('');
+
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${data.title}</strong> ${data.isPinned ? '<span style="color:var(--accent-gold); font-size:10px;">[PINNED]</span>' : ''}<br><small style="color:var(--text-muted);">${data.subject} | By ${data.author}</small></td>
+              <td>
+                <button class="${data.isPinned ? 'btn-primary' : 'btn-outline'}" style="padding:4px 8px; font-size:10px;" onclick="togglePin('${doc.id}', ${data.isPinned || false})">
+                  ${data.isPinned ? 'UNPIN' : 'PIN'}
+                </button>
+              </td>
+              <td>${likes.length}</td>
+              <td>${comments.length}</td>
+              <td>
+                <button class="btn-outline" style="padding:4px 8px; font-size:10px; margin-right:4px;" onclick="editPost('${doc.id}', \`${escapeQuotes(data.title)}\`, \`${escapeQuotes(data.author)}\`, '${data.subject}', \`${data.imageUrl || ''}\`, \`${escapeQuotes(data.content)}\`)">Edit</button>
+                <button class="btn-danger" style="padding:4px 8px; font-size:10px;" onclick="deleteArticle('${doc.id}')">Delete</button>
+              </td>
+            </tr>
+            ${(likes.length > 0 || comments.length > 0) ? `
+              <tr>
+                <td colspan="5" style="background:var(--bg-color); padding:10px 15px;">
+                  ${likes.length > 0 ? `<div style="margin-bottom:10px;"><strong style="font-size:10px; color:var(--text-muted); letter-spacing:1px;">LIKED BY:</strong>${likersHtml}</div>` : ''}
+                  ${comments.length > 0 ? `<div><strong style="font-size:10px; color:var(--text-muted); letter-spacing:1px;">COMMENTS & REPLIES:</strong>${commentsHtml}</div>` : ''}
+                </td>
+              </tr>
+            ` : ''}
+          `;
+        });
+        document.getElementById('totalPosts').innerText = count;
+        document.getElementById('totalLikes').innerText = tLikes;
+      });
+    }
+
+    function addAdminReply(articleId, commentId) {
+      const replyInput = document.getElementById(`reply-input-${commentId}`);
+      const replyText = replyInput.value.trim();
+      if (!replyText) return alert("Write something to reply!");
+
+      const ref = db.collection("articles").doc(articleId);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          let comments = doc.data().comments || [];
+          const cmtIndex = comments.findIndex(c => c.id === commentId);
+          if (cmtIndex > -1) {
+            if (!comments[cmtIndex].replies) comments[cmtIndex].replies = [];
+            comments[cmtIndex].replies.push({
+              id: 'rply_' + Date.now(),
+              text: replyText,
+              createdAt: new Date().toISOString()
+            });
+            ref.update({ comments }).then(() => {
+              replyInput.value = '';
+              alert("Reply added successfully!");
+            });
+          }
+        }
+      });
+    }
+
+    function removeSpecificLike(articleId, userUid) {
+      if (!confirm("Remove like for this user?")) return;
+      const ref = db.collection("articles").doc(articleId);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          let likes = doc.data().likes || [];
+          likes = likes.filter(l => (typeof l === 'string' ? l !== userUid : l.uid !== userUid));
+          ref.update({ likes });
+        }
+      });
+    }
+
+    function deleteComment(articleId, commentId) {
+      if (!confirm("Delete this comment?")) return;
+      const ref = db.collection("articles").doc(articleId);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          const comments = (doc.data().comments || []).filter(c => c.id !== commentId);
+          ref.update({ comments });
+        }
+      });
+    }
+
+    function deleteArticle(id) { 
+      if (confirm("Delete this post permanently?")) db.collection("articles").doc(id).delete(); 
+    }
+
+    function escapeQuotes(str) { return str ? str.replace(/`/g, "\\`").replace(/"/g, "&quot;") : ''; }
+  </script>
+</body>
+</html>
